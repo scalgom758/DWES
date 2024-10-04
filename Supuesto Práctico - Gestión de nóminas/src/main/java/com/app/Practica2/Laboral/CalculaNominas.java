@@ -14,6 +14,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
 
+import org.mariadb.jdbc.internal.util.OptionUtils;
+
 import com.app.Practica2.Excepciones.DatosNoCorrectosException;
 
 /**
@@ -94,32 +96,43 @@ public class CalculaNominas {
 				case 0:
 					System.out.println("Adios");
 					break;
+
 				case 1:
 					leeEmpleados(conn);
 					break;
+
 				case 2:
 					System.out.println("Introduce el DNI del empleado:");
 					String dni = sc.next();
 					mostrarSalarioPorDni(conn, dni);
 					break;
+
 				case 3:
 					modificarEmpleado(conn);
 					break;
-				case 4:
-					
-					break;
-		        case 5:
-		            
-					break;
-				case 6:
 
+				case 4:
+					System.out.println("Introduce el DNI del empleado:");
+					dni = sc.next();
+					actualizarSueldoEmpleado(conn, dni);
 					break;
+
+				case 5:
+					actualizarSueldos(conn);
+					break;
+
+				case 6:
+					copiaSeguridad(conn);
+					break;
+
 				case 7:
 					altaEmpleado(conn, new Empleado("Jesus Garcia", "32000033J", 'M', 4, 10));
 					break;
+
 				case 8:
 					altaEmpleado(conn, "empleadosNuevos.txt");
 					break;
+
 				default:
 					System.out.println("No existe la opcion\n" + "");
 					break;
@@ -128,7 +141,7 @@ public class CalculaNominas {
 			} while (opc != 0);
 
 		} catch (SQLException ex) {
-			System.out.println("Ocurrio una excepcion al conectarse a la BD");
+			System.out.println("Ocurrio una excepcion al conectarse a la BD" + ex.getMessage());
 		} finally {
 			try {
 				if (conn != null) {
@@ -226,7 +239,7 @@ public class CalculaNominas {
 	private static void modificarEmpleado(Connection conn) throws SQLException {
 		Scanner sc = new Scanner(System.in);
 		System.out.print("Introduce el DNI del empleado a modificar: ");
-		String dniEmpleado = sc.nextLine();
+		String dni = sc.nextLine();
 
 		int subopc;
 		do {
@@ -236,64 +249,157 @@ public class CalculaNominas {
 			sc.nextLine();
 
 			String consulta = "";
-			try (PreparedStatement ps = conn.prepareStatement(consulta)) {
-				switch (subopc) {
-				case 0:
-					System.out.println("Volviendo al menú principal...\n" + "");
-					break;
-				case 1:
-					System.out.print("Introduce el nuevo nombre: ");
-					String nuevoNombre = sc.nextLine();
-					consulta = "UPDATE empleados SET nombre = ? WHERE dni = ?";
+			switch (subopc) {
+			case 0:
+				System.out.println("Volviendo al menú principal...\n");
+				break;
+
+			case 1:
+				System.out.print("Introduce el nuevo nombre: ");
+				String nuevoNombre = sc.nextLine();
+				consulta = "UPDATE empleados SET nombre = ? WHERE dni = ?";
+				try (PreparedStatement ps = conn.prepareStatement(consulta)) {
 					ps.setString(1, nuevoNombre);
-					ps.setString(2, dniEmpleado);
+					ps.setString(2, dni);
 					ps.executeUpdate();
 					System.out.println("Se ha modificado el nombre");
-					break;
-				case 2:
-					System.out.print("Introduce el nuevo DNI: ");
-					String nuevoDNI = sc.nextLine();
-					consulta = "UPDATE empleados SET dni = ? WHERE dni = ?";
+				} catch (SQLException ex) {
+					System.out.println("Error al modificar el nombre del empleado");
+				}
+				break;
+
+			case 2:
+				System.out.print("Introduce el nuevo DNI: ");
+				String nuevoDNI = sc.nextLine();
+				consulta = "UPDATE empleados SET dni = ? WHERE dni = ?";
+				try (PreparedStatement ps = conn.prepareStatement(consulta)) {
 					ps.setString(1, nuevoDNI);
-					ps.setString(2, dniEmpleado);
+					ps.setString(2, dni);
 					ps.executeUpdate();
 					System.out.println("Se ha modificado el DNI");
-					break;
-				case 3:
-					System.out.print("Introduce el nuevo sexo: ");
-					char nuevoSexo = sc.nextLine().charAt(0);
-					consulta = "UPDATE empleados SET sexo = ? WHERE dni = ?";
+					dni = nuevoDNI;
+				} catch (SQLException ex) {
+					System.out.println("Error al modificar el DNI del empleado");
+				}
+				break;
+
+			case 3:
+				System.out.print("Introduce el nuevo sexo (M/F): ");
+				char nuevoSexo = sc.nextLine().charAt(0);
+				consulta = "UPDATE empleados SET sexo = ? WHERE dni = ?";
+				try (PreparedStatement ps = conn.prepareStatement(consulta)) {
 					ps.setString(1, String.valueOf(nuevoSexo));
-					ps.setString(2, dniEmpleado);
+					ps.setString(2, dni);
 					ps.executeUpdate();
 					System.out.println("Se ha modificado el sexo");
-					break;
-				case 4:
-					System.out.print("Introduce la nueva categoria: ");
-					int nuevaCategoria = sc.nextInt();
-					consulta = "UPDATE empleados SET categoria = ? WHERE dni = ?";
+				} catch (SQLException ex) {
+					System.out.println("Error al modificar el sexo del empleado");
+				}
+				break;
+
+			case 4:
+				System.out.print("Introduce la nueva categoria: ");
+				int nuevaCategoria = sc.nextInt();
+				consulta = "UPDATE empleados SET categoria = ? WHERE dni = ?";
+				try (PreparedStatement ps = conn.prepareStatement(consulta)) {
 					ps.setInt(1, nuevaCategoria);
-					ps.setString(2, dniEmpleado);
+					ps.setString(2, dni);
 					ps.executeUpdate();
 					System.out.println("Se ha modificado la categoria");
-					break;
-				case 5:
-					System.out.print("Introduce los nuevos años trabajados: ");
-					int nuevosAnios = sc.nextInt();
-					consulta = "UPDATE empleados SET anyos = ? WHERE dni = ?";
+				} catch (SQLException ex) {
+					System.out.println("Error al modificar la categoría del empleado");
+				}
+				break;
+
+			case 5:
+				System.out.print("Introduce los nuevos años trabajados: ");
+				int nuevosAnios = sc.nextInt();
+				consulta = "UPDATE empleados SET anyos = ? WHERE dni = ?";
+				try (PreparedStatement ps = conn.prepareStatement(consulta)) {
 					ps.setInt(1, nuevosAnios);
-					ps.setString(2, dniEmpleado);
+					ps.setString(2, dni);
 					ps.executeUpdate();
 					System.out.println("Se han modificado los años trabajados");
-					break;
-				default:
-					System.out.println("No existe la opcion\n");
-					break;
+				} catch (SQLException ex) {
+					System.out.println("Error al modificar los años trabajados del empleado");
 				}
-			} catch (SQLException ex) {
-				System.out.println("Error al modificar al empleado");
+				break;
+
+			default:
+				System.out.println("No existe la opcion\n" + "");
+				break;
+
 			}
+
 		} while (subopc != 0);
 	}
 
+	private static void actualizarSueldoEmpleado(Connection conn, String dni)
+			throws SQLException, DatosNoCorrectosException, com.app.Practica1.Excepciones.DatosNoCorrectosException {
+		String consulta = "SELECT categoria, anyos FROM empleados WHERE dni = ?";
+		PreparedStatement ps = conn.prepareStatement(consulta);
+		ps.setString(1, dni);
+		ResultSet rs = ps.executeQuery();
+
+		if (rs.next()) {
+			int categoria = rs.getInt("categoria");
+			int anyos = rs.getInt("anyos");
+			Empleado emp = new Empleado("", dni, 'M', categoria, anyos);
+
+			Nomina nomina = new Nomina();
+			int nuevoSueldo = nomina.sueldo(emp);
+
+			String actualizarSueldo = "UPDATE empleados SET sueldo = ? WHERE dni = ?";
+			PreparedStatement psU = conn.prepareStatement(actualizarSueldo);
+			psU.setInt(1, nuevoSueldo);
+			psU.setString(2, dni);
+			psU.executeUpdate();
+		}
+		System.out.println("Sueldo actualizado");
+	}
+
+	private static void actualizarSueldos(Connection conn)
+			throws SQLException, DatosNoCorrectosException, com.app.Practica1.Excepciones.DatosNoCorrectosException {
+		String consulta = "SELECT dni, categoria, anyos FROM empleados";
+		PreparedStatement ps = conn.prepareStatement(consulta);
+		ResultSet rs = ps.executeQuery();
+
+		while (rs.next()) {
+			String dni = rs.getString("dni");
+			int categoria = rs.getInt("categoria");
+			int anyos = rs.getInt("anyos");
+
+			Empleado emp = new Empleado("", dni, 'M', categoria, anyos);
+
+			Nomina nomina = new Nomina();
+			int nuevoSueldo = nomina.sueldo(emp);
+
+			String actualizarSueldo = "UPDATE empleados SET sueldo = ? WHERE dni = ?";
+			PreparedStatement psU = conn.prepareStatement(actualizarSueldo);
+			psU.setInt(1, nuevoSueldo);
+			psU.setString(2, dni);
+			psU.executeUpdate();
+		}
+		System.out.println("Sueldos actualizados");
+	}
+
+	private static void copiaSeguridad(Connection conn) throws SQLException, IOException {
+		String consulta = "SELECT nombre, dni, sexo, categoria, anyos, sueldo FROM empleados";
+		PreparedStatement ps = conn.prepareStatement(consulta);
+		ResultSet rs = ps.executeQuery();
+		String outputFile = "src\\main\\java\\com\\app\\Practica2\\Laboral\\backup_empleados.txt";
+		DataOutputStream backup = new DataOutputStream(new FileOutputStream(outputFile));
+
+		while (rs.next()) {
+			String nombre = rs.getString("nombre");
+			String dni = rs.getString("dni");
+			char sexo = rs.getString("sexo").charAt(0);
+			int categoria = rs.getInt("categoria");
+			int anyos = rs.getInt("anyos");
+			int sueldo = rs.getInt("sueldo");
+
+			backup.writeBytes(nombre + ", " + dni + ", " + sexo + ", " + categoria + ", " + anyos + ", " + sueldo + "\n");
+		}
+		System.out.println("Se ha realizado la copia de seguridad");
+	}
 }
