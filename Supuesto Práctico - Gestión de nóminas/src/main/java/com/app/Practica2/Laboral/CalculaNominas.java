@@ -228,7 +228,7 @@ public class CalculaNominas {
 				int sueldo = rs.getInt("sueldo");
 				System.out.println(sueldo);
 			} else {
-				System.out.println("No existe un empleado con DNI " + dni);
+				System.out.println("No existe el empleado con ese DNI");
 			}
 		} catch (SQLException ex) {
 			System.out.println("Ocurrio un error al obtener el salario.");
@@ -251,7 +251,7 @@ public class CalculaNominas {
 			String consulta = "";
 			switch (subopc) {
 			case 0:
-				System.out.println("Volviendo al menú principal...\n");
+				System.out.println("Volviendo al menu principal...\n");
 				break;
 
 			case 1:
