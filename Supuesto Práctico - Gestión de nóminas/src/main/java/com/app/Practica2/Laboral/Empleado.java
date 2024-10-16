@@ -1,6 +1,6 @@
 package com.app.Practica2.Laboral;
 
-import com.app.Practica1.Excepciones.DatosNoCorrectosException;
+import com.app.Practica2.Excepciones.DatosNoCorrectosException;
 
 /**
  * Clase empleado que extiende de Persona
