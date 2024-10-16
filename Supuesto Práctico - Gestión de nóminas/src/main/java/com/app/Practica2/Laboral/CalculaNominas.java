@@ -38,10 +38,10 @@ public class CalculaNominas {
 	 *                                                                 del empleado.
 	 * @throws IOException
 	 * @throws FileNotFoundException
-	 * @throws com.app.Practica1.Excepciones.DatosNoCorrectosException
+	 * @throws com.app.Practica2.Excepciones.DatosNoCorrectosException
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException, DatosNoCorrectosException,
-			com.app.Practica1.Excepciones.DatosNoCorrectosException {
+			com.app.Practica2.Excepciones.DatosNoCorrectosException {
 
 //		String inputFile = "src\\main\\java\\com\\app\\Practica2\\Laboral\\empleados.txt";
 //		String outputFile = "src\\main\\java\\com\\app\\Practica2\\Laboral\\sueldos.dat";
